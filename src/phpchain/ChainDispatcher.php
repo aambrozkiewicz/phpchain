@@ -9,9 +9,9 @@ class ChainDispatcher
     private $definitions;
 
     /**
-     * @param \ArrayObject $container Dependency Injection Container
+     * @param \ArrayAccess $container Dependency Injection Container
      */
-    public function __construct(\ArrayObject $container)
+    public function __construct(\ArrayAccess $container)
     {
         $this->container = $container;
     }
