@@ -34,8 +34,8 @@ abstract class ChainStep
     {
         $result = $this->process($input);
 
-        return $result === false || is_null($this->nextStep)
-            ? null
+        return $result !== null || is_null($this->nextStep)
+            ? $result
             : $this->nextStep->execute($input);
     }
 
