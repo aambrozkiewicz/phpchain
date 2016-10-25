@@ -1,4 +1,4 @@
-# phpchain ![master](https://travis-ci.org/aambrozkiewicz/phpchain.svg?branch=master)
+# phpchain [![Build Status](https://travis-ci.org/aambrozkiewicz/phpchain.svg?branch=master)](https://travis-ci.org/aambrozkiewicz/phpchain)
 Set of classes that help to create chains of steps to minimize clutter in domain logic.
 
 ## Install
