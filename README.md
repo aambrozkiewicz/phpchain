@@ -1,5 +1,8 @@
-# phpchain
+# phpchain ![master](https://travis-ci.org/aambrozkiewicz/phpchain.svg?branch=master)
 Set of classes that help to create chains of steps to minimize clutter in domain logic.
+
+## Install
+`composer require aambr/phpchain`
 
 ## Quick start
 ```php
