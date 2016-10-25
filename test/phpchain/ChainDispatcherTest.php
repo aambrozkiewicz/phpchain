@@ -53,21 +53,4 @@ class ChainDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(null, $stepOne->execute($input));
         $this->assertArrayHasKey('stepAlteredKey', $input);
     }
-
-    public function testBreakTheChainWithReturnValue()
-    {
-        $stepOne = $this->getMockForAbstractClass('phpchain\ChainStep');
-        $stepTwo = $this->getMockForAbstractClass('phpchain\ChainStep');
-
-        $stepOne->expects($this->once())
-            ->method('process')
-            ->will($this->returnCallback(function(\ArrayObject $input) {
-                return 1;
-            }));
-
-        $stepOne->setNext($stepTwo);
-
-        $this->assertNotSame('value', $result = $stepOne->execute(new \ArrayObject));
-        $this->assertSame(1, $result);
-    }
 }

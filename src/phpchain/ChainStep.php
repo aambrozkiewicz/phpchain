@@ -23,6 +23,11 @@ abstract class ChainStep
         return $nextStep;
     }
 
+    protected function should(\ArrayAccess $input)
+    {
+        return true;
+    }
+
     /**
      * Executes a chain of steps.
      *
@@ -32,7 +37,7 @@ abstract class ChainStep
      */
     public function execute(\ArrayAccess $input)
     {
-        $result = $this->process($input);
+        $result = $this->should($input) ? $this->process($input) : null;
 
         return $result !== null || is_null($this->nextStep)
             ? $result
