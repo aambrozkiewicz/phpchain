@@ -12,7 +12,7 @@ class ChainDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $stepOne = $this->getMockForAbstractClass(ChainStep::class);
 
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
         $container
             ->expects($this->once())
             ->method('get')
@@ -38,7 +38,7 @@ class ChainDispatcherTest extends \PHPUnit_Framework_TestCase
                 $input['stepAlteredKey'] = true;
             }));
 
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
         $container
             ->expects($this->at(0))
             ->method('get')
