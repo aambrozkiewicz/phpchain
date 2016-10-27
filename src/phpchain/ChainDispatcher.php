@@ -10,7 +10,6 @@ class ChainDispatcher
     private $container;
 
     private $definitions = [];
-    private $compiled = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -35,10 +34,6 @@ class ChainDispatcher
             throw new \OutOfBoundsException('No chain with code ' . $code);
         }
 
-        if (!empty($this->compiled[$code])) {
-            return $this->compiled[$code];
-        }
-
         $chainDefinition = $this->definitions[$code];
         $currentStep = $firstStep = null;
 
@@ -56,6 +51,6 @@ class ChainDispatcher
             $currentStep = $stepInstance;
         }
 
-        return $this->compiled[$code] = $firstStep;
+        return $firstStep;
     }
 }
