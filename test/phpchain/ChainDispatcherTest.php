@@ -2,31 +2,35 @@
 
 namespace test\phpchain;
 
+use Interop\Container\ContainerInterface;
 use phpchain\ChainDispatcher;
+use phpchain\ChainStep;
 
 class ChainDispatcherTest extends \PHPUnit_Framework_TestCase
 {
     public function testDispatchSingleStepChain()
     {
-        $stepOne = $this->getMockForAbstractClass('phpchain\ChainStep');
+        $stepOne = $this->getMockForAbstractClass(ChainStep::class);
 
-        $container = new \ArrayObject([
-            'stepOne' => $stepOne,
-            'otherDependency' => 'no definition'
-        ]);
+        $container = $this->getMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with('stepOne')
+            ->willReturn($stepOne);
 
         $dispatcher = new ChainDispatcher($container);
-        $dispatcher->chain('user.register')->define([
+        $dispatcher->define('hello.world', [
             'stepOne'
         ]);
 
-        $this->assertSame($stepOne, $dispatcher->dispatch());
+        $this->assertSame($stepOne, $dispatcher->dispatch('hello.world'));
     }
 
     public function testDispatchChainWithMultipleSteps()
     {
-        $stepOne = $this->getMockForAbstractClass('phpchain\ChainStep');
-        $stepTwo = $this->getMockForAbstractClass('phpchain\ChainStep');
+        $stepOne = $this->getMockForAbstractClass(ChainStep::class);
+        $stepTwo = $this->getMockForAbstractClass(ChainStep::class);
 
         $stepTwo->expects($this->once())
             ->method('process')
@@ -34,17 +38,24 @@ class ChainDispatcherTest extends \PHPUnit_Framework_TestCase
                 $input['stepAlteredKey'] = true;
             }));
 
-        $container = new \ArrayObject([
-            'stepOne' => $stepOne,
-            'stepTwo' => $stepTwo
-        ]);
+        $container = $this->getMock(ContainerInterface::class);
+        $container
+            ->expects($this->at(0))
+            ->method('get')
+            ->with('stepOne')
+            ->willReturn($stepOne);
+        $container
+            ->expects($this->at(1))
+            ->method('get')
+            ->with('stepTwo')
+            ->willReturn($stepTwo);
 
         $dispatcher = new ChainDispatcher($container);
-        $dispatcher->chain('user.login')->define([
+        $dispatcher->define('user.login', [
             'stepOne', 'stepTwo'
         ]);
 
-        $this->assertSame($stepOne, $dispatcher->dispatch());
+        $this->assertSame($stepOne, $dispatcher->dispatch('user.login'));
 
         $input = new \ArrayObject([
             'hello' => 'world'

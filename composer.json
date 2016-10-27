@@ -6,7 +6,9 @@
             "email": "a.ambrozkiewicz@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "container-interop/container-interop": "^1.1"
+    },
     "require-dev": {
         "phpunit/phpunit": "4.7.*"
     },

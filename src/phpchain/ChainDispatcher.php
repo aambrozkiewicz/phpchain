@@ -2,53 +2,60 @@
 
 namespace phpchain;
 
+use Interop\Container\ContainerInterface;
+
 class ChainDispatcher
 {
-    private $code;
+    /** @var ContainerInterface */
     private $container;
-    private $definitions;
 
-    /**
-     * @param \ArrayAccess $container Dependency Injection Container
-     */
-    public function __construct(\ArrayAccess $container)
+    private $definitions = [];
+    private $compiled = [];
+
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    public function chain($code)
+    public function define($code, array $steps)
     {
-        $this->code = $code;
+        $this->definitions[$code] = $steps;
 
         return $this;
     }
 
-    public function define(array $steps)
+    /**
+     * @param string $code
+     *
+     * @return ChainStep
+     */
+    public function dispatch($code)
     {
-        $this->definitions[$this->code] = $steps;
-
-        return $this;
-    }
-
-    public function dispatch()
-    {
-        if (empty($this->definitions[$this->code])) {
-            throw new \OutOfBoundsException('No chain with code ' . $this->code);
+        if (empty($this->definitions[$code])) {
+            throw new \OutOfBoundsException('No chain with code ' . $code);
         }
 
-        $chainDefinition = $this->definitions[$this->code];
-        $firstStepDefinition = array_shift($chainDefinition);
-        $firstStep = $currentStep = is_object($firstStepDefinition)
-            ? $firstStepDefinition
-            : $this->container[$firstStepDefinition];
-
-        foreach ($chainDefinition as $step) {
-            $stepInstance = is_object($step) ? $step : $this->container[$step];
-            $currentStep = $currentStep->setNext($stepInstance);
+        if (!empty($this->compiled[$code])) {
+            return $this->compiled[$code];
         }
 
-        $this->code = null;
+        $chainDefinition = $this->definitions[$code];
+        $currentStep = $firstStep = null;
 
-        return $firstStep;
+        while ($step = array_shift($chainDefinition)) {
+            $stepInstance = $step instanceof ChainStep
+                ? $step
+                : $this->container->get($step);
+
+            if (is_null($currentStep)) {
+                $firstStep = $stepInstance;
+            } else {
+                $currentStep->setNext($stepInstance);
+            }
+
+            $currentStep = $stepInstance;
+        }
+
+        return $this->compiled[$code] = $firstStep;
     }
 }

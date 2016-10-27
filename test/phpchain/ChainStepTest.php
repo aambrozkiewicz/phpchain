@@ -2,12 +2,14 @@
 
 namespace test\phpchain;
 
+use phpchain\ChainStep;
+
 class ChainStepTest extends \PHPUnit_Framework_TestCase
 {
     public function testBreakTheChainWithReturnValue()
     {
-        $stepOne = $this->getMockForAbstractClass('phpchain\ChainStep');
-        $stepTwo = $this->getMockForAbstractClass('phpchain\ChainStep');
+        $stepOne = $this->getMockForAbstractClass(ChainStep::class);
+        $stepTwo = $this->getMockForAbstractClass(ChainStep::class);
 
         $stepOne->expects($this->once())
             ->method('process')
@@ -23,7 +25,7 @@ class ChainStepTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteWhenAppropriate()
     {
-        $step = $this->getMockForAbstractClass('phpchain\ChainStep', [], '', true, true, true, ['should']);
+        $step = $this->getMockForAbstractClass(ChainStep::class, [], '', true, true, true, ['should']);
         $step->expects($this->once())
             ->method('should')
             ->willReturn(false);
