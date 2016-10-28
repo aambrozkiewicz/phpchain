@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>PHPChain by aambrozkiewicz</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>PHPChain</h1>
+        <h2>Create chains with reusable steps for better domain logic structure</h2>
+        <a href="https://github.com/aambrozkiewicz/phpchain" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="phpchain-" class="anchor" href="#phpchain-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>phpchain <a href="https://travis-ci.org/aambrozkiewicz/phpchain"><img src="https://travis-ci.org/aambrozkiewicz/phpchain.svg?branch=master" alt="Build Status"></a>
+</h1>
+
+<p>Set of classes that help to create chains of steps to minimize clutter in domain logic.</p>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install</h2>
+
+<p><code>composer require aambr/phpchain</code></p>
+
+<h2>
+<a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quick start</h2>
+
+<p>Start with definition of a chain, each step can be instance of <code>ChainStep</code> or string, which is resolved using injected dependency injection container.</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$dispatcher</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">ChainDispatcher</span>(<span class="pl-smi">$dependencyInjectionContainer</span>);</span>
+<span class="pl-s1"><span class="pl-smi">$dispatcher</span><span class="pl-k">-&gt;</span>define(<span class="pl-s"><span class="pl-pds">'</span>user.register<span class="pl-pds">'</span></span>, [</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>Domain\Steps\CreateUserStep<span class="pl-pds">'</span></span>, </span>
+<span class="pl-s1">  <span class="pl-c1">Domain\Steps\</span><span class="pl-c1">CreateProfileStep</span><span class="pl-k">::</span><span class="pl-c1">class</span>, </span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>sendWelcomeEmail<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">]); <span class="pl-c">// all of these will be resolved by dependency container unless </span></span>
+<span class="pl-s1">    <span class="pl-c">// there is a concrete ChainStep object ready</span></span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$dispatcher</span><span class="pl-k">-&gt;</span>dispatch(<span class="pl-s"><span class="pl-pds">'</span>user.register<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>execute(<span class="pl-k">new</span> <span class="pl-c1">\ArrayObject</span>([</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>username<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>valid-username<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>email<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>valid@email.com<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">])); <span class="pl-c">// steps can modify \ArrayObject (passed by reference)</span></span></pre></div>
+
+<p><code>ChainDispatcher</code> accepts any dependency injection container which comply with <a href="https://github.com/container-interop/container-interop">Container Interoperability</a> interface.</p>
+
+<h2>
+<a id="divide-and-conquer" class="anchor" href="#divide-and-conquer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Divide and conquer</h2>
+
+<p>The goal is to devide complex domain logic into individual steps that can be reused in future processes.
+Create your own steps by inheriting <code>ChainStep</code> and implement logic in <code>process(\ArrayObject $input)</code>.</p>
+
+<h2>
+<a id="share-variables-between-steps" class="anchor" href="#share-variables-between-steps" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Share variables between steps</h2>
+
+<p>Steps can share variables between each other by altering <code>$input</code> keys, which is possible because we 
+are passing <code>\ArrayObject</code> instance reference instead an array which is passed by value. For example
+<code>CreateUserStep</code> after successful action can set <code>$input['user'] = $createdUser</code>, which then can be used
+by <code>sendWelcomeEmail</code>.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/aambrozkiewicz/phpchain/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/aambrozkiewicz/phpchain/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/aambrozkiewicz/phpchain"></a> is maintained by <a href="https://github.com/aambrozkiewicz">aambrozkiewicz</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
