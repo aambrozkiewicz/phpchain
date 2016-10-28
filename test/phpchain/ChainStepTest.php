@@ -34,4 +34,22 @@ class ChainStepTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(null, $step->execute(new \ArrayObject));
     }
+
+    public function testExecuteWhenOneShouldnt()
+    {
+        $two = $this->getMockForAbstractClass(ChainStep::class, [], '', true, true, true, ['should']);
+        $two->expects($this->once())
+            ->method('should')
+            ->willReturn(false);
+        $two->expects($this->never())
+            ->method('process');
+
+        $one = $this->getMockForAbstractClass(ChainStep::class);
+        $one->expects($this->once())
+            ->method('process');
+
+        $one->setNext($two);
+
+        $this->assertSame(null, $one->execute(new \ArrayObject));
+    }
 }

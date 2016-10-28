@@ -23,6 +23,12 @@ abstract class ChainStep
         return $nextStep;
     }
 
+    /**
+     * Test function whether to process this step or not
+     *
+     * @param \ArrayAccess $input
+     * @return bool
+     */
     protected function should(\ArrayAccess $input)
     {
         return true;
